@@ -1,5 +1,7 @@
 package com.murilonerdx.springgrpclearning.dto;
 
+import com.murilonerdx.springgrpclearning.domain.Product;
+
 public class ProductInputDTO {
     private final String name;
     private final Double price;

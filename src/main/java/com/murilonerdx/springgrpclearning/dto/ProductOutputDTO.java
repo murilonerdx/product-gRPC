@@ -1,5 +1,7 @@
 package com.murilonerdx.springgrpclearning.dto;
 
+import com.murilonerdx.springgrpclearning.domain.Product;
+
 public class ProductOutputDTO {
     private final Long id;
     private final String name;
@@ -27,5 +29,9 @@ public class ProductOutputDTO {
 
     public Integer getQuantityInStock() {
         return quantityInStock;
+    }
+
+    Product toProduct(){
+        return new Product(this.id, this.name, this.price, this.quantityInStock);
     }
 }
