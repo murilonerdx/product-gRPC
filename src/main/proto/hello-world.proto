@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.murilonerdx.springgrpclearning";
+option java_multiple_files = true;
+
+package com.murilonerdx.springgrpclearning;
+
+service HelloService {
+  rpc Hello(HelloReq) returns (HelloRes);
+}
+
+message HelloReq{
+  string message = 1;
+}
+
+message HelloRes{
+  string message = 1;
+}
