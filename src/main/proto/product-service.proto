@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_package = "com.murilonerdx.springgrpclearning";
+option java_multiple_files = true;
+
+package com.murilonerdx.springgrpclearning;
+
+service ProductService {
+  rpc Create(ProductRequest) returns (ProductResponse);
+  rpc FindById(RequestById) returns (ProductResponse);
+  rpc Delete(RequestById) returns (ProductResponse);
+  rpc FindAll(EmptyRequest) returns (ProductResponseList);
+}
+
+message ProductResponseList{
+  repeated ProductResponse products = 1;
+}
+
+message EmptyRequest{
+}
+
+message RequestById {
+  int64 id = 1;
+}
+
+message ProductRequest{
+  int64 id = 1;
+  string name = 2;
+  double price = 3;
+  int32 quantity_in_stock = 4;
+}
+
+message ProductResponse{
+  int64 id = 1;
+  string name = 2;
+  double price = 3;
+  int32 quantity_in_stock = 4;
+}
