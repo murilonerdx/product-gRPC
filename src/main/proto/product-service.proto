@@ -12,7 +12,6 @@ service ProductService {
   rpc FindAll(EmptyRequest) returns (ProductResponseList);
 }
 
-
 message ProductResponseList{
   repeated ProductResponse products = 1;
 }
