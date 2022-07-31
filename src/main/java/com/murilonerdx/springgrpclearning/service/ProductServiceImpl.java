@@ -21,9 +21,9 @@ public class ProductServiceImpl implements IProductService{
 
     @Override
     public ProductOutputDTO create(ProductInputDTO inputDTO) {
-        var product = ProductConverterUtil.productToProductInputDto(inputDTO);
+        var product = ProductConverterUtil.productInputDtoToProductTo(inputDTO);
         var productCreate = this.repository.save(product);
-        
+
         return ProductConverterUtil.productToProductOutputDto(productCreate);
     }
 

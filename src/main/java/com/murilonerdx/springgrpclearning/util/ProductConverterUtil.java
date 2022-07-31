@@ -15,7 +15,7 @@ public class ProductConverterUtil {
         );
     }
 
-    public static Product productToProductInputDto(ProductInputDTO product){
+    public static Product productInputDtoToProductTo(ProductInputDTO product){
         return new Product(
                 null,
                 product.getName(),
