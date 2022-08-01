@@ -10,6 +10,9 @@ import com.murilonerdx.springgrpclearning.service.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @GrpcService
 public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
 
@@ -65,7 +68,19 @@ public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
 
     @Override
     public void findAll(EmptyRequest request, StreamObserver<ProductResponseList> responseObserver) {
-        super.findAll(request, responseObserver);
+        List<ProductOutputDTO> productDTOs = productService.findAll();
+        List<ProductResponse> productList = productDTOs.stream()
+                .map(product -> ProductResponse.newBuilder()
+                        .setId(product.getId())
+                        .setName(product.getName())
+                        .setPrice(product.getPrice())
+                        .setQuantityInStock(product.getQuantityInStock())
+                        .build()).collect(Collectors.toList());
+
+        ProductResponseList productResponseList =
+                ProductResponseList.newBuilder().addAllProducts(productList).build();
+        responseObserver.onNext(productResponseList);
+        responseObserver.onCompleted();
     }
 
 }
