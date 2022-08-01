@@ -102,5 +102,30 @@ public class ProductServiceImplTest {
                 .isThrownBy(() -> productService.findById(id));
     }
 
+    @Test
+    @DisplayName("when delete product is call with id should does not throw")
+    public void deleteProductTest() {
+        Long id = 1L;
+
+        Product product = new Product(1L,
+                "Product A",
+                10.99,
+                10);
+
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+
+        Assertions.assertThatNoException().isThrownBy(() -> productService.findById(id));
+    }
+
+    @Test
+    @DisplayName("when delete product is call with id should does not throws ProductNotFoundException")
+    public void deleteProductExceptionTest() {
+        Long id = 1L;
+
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ProductNotFoundException.class)
+                .isThrownBy(() -> productService.delete(id));
+    }
 
 }
