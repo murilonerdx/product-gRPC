@@ -3,6 +3,7 @@ package com.murilonerdx.springgrpclearning.resource;
 import com.murilonerdx.springgrpclearning.ProductRequest;
 import com.murilonerdx.springgrpclearning.ProductResponse;
 import com.murilonerdx.springgrpclearning.ProductServiceGrpc;
+import com.murilonerdx.springgrpclearning.RequestById;
 import com.murilonerdx.springgrpclearning.exception.ProductAlreadyExistsException;
 import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -11,6 +12,7 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -25,10 +27,11 @@ public class ProductResourceTest {
     @GrpcClient("inProcess")
     private ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
+    @Autowired
     private Flyway flyWay;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         flyWay.clean();
         flyWay.migrate();
     }
@@ -66,4 +69,25 @@ public class ProductResourceTest {
 
     }
 
+    @Test
+    @DisplayName("when findById method is call with valid id a product is returned")
+    public void findByIdProductSuccessTest() {
+        RequestById productRequest = RequestById.newBuilder().setId(1L).build();
+
+        ProductResponse productResponse = productServiceGrpc.findById(productRequest);
+
+        Assertions.assertThat(productResponse.getId()).isEqualTo(productResponse.getId());
+        Assertions.assertThat(productResponse.getName()).isEqualTo("Product A");
+    }
+
+    @Test
+    @DisplayName("when findById is call with invalid, throw ProductNotFound")
+    public void findByIdExceptionTest() {
+        RequestById productRequest = RequestById.newBuilder().setId(100L).build();
+
+        assertThatExceptionOfType(StatusRuntimeException.class)
+                .isThrownBy(() -> productServiceGrpc.findById(productRequest))
+                .withMessage("NOT_FOUND: Produto com id 100 não encontrado");
+
+    }
 }
