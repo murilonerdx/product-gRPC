@@ -10,6 +10,9 @@ import com.murilonerdx.springgrpclearning.service.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @GrpcService
 public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
 
@@ -42,18 +45,42 @@ public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
 
     @Override
     public void findById(RequestById request, StreamObserver<ProductResponse> responseObserver) {
-        super.findById(request, responseObserver);
+        var productOutputDTO = productService.findById(request.getId());
+
+        ProductResponse response = ProductResponse.newBuilder()
+                .setId(productOutputDTO.getId())
+                .setName(productOutputDTO.getName())
+                .setPrice(productOutputDTO.getPrice())
+                .setQuantityInStock(productOutputDTO.getQuantityInStock())
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
-    public void delete(RequestById request, StreamObserver<ProductResponse> responseObserver) {
-        super.delete(request, responseObserver);
+    public void delete(RequestById request, StreamObserver<EmptyResponse> responseObserver) {
+        productService.delete(request.getId());
+
+        responseObserver.onNext(EmptyResponse.newBuilder().build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void findAll(EmptyRequest request, StreamObserver<ProductResponseList> responseObserver) {
-        super.findAll(request, responseObserver);
-    }
+        List<ProductOutputDTO> productDTOs = productService.findAll();
+        List<ProductResponse> productList = productDTOs.stream()
+                .map(product -> ProductResponse.newBuilder()
+                        .setId(product.getId())
+                        .setName(product.getName())
+                        .setPrice(product.getPrice())
+                        .setQuantityInStock(product.getQuantityInStock())
+                        .build()).collect(Collectors.toList());
 
+        ProductResponseList productResponseList =
+                ProductResponseList.newBuilder().addAllProducts(productList).build();
+        responseObserver.onNext(productResponseList);
+        responseObserver.onCompleted();
+    }
 
 }

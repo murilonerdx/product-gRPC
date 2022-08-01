@@ -4,6 +4,7 @@ import com.murilonerdx.springgrpclearning.domain.Product;
 import com.murilonerdx.springgrpclearning.dto.ProductInputDTO;
 import com.murilonerdx.springgrpclearning.dto.ProductOutputDTO;
 import com.murilonerdx.springgrpclearning.exception.ProductAlreadyExistsException;
+import com.murilonerdx.springgrpclearning.exception.ProductNotFoundException;
 import com.murilonerdx.springgrpclearning.repository.ProductRepository;
 import com.murilonerdx.springgrpclearning.service.ProductServiceImpl;
 import org.assertj.core.api.Assertions;
@@ -12,13 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -33,12 +35,11 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("when create product service is call with valid data a product is returned")
-    public void createProductSuccessTest(){
+    public void createProductSuccessTest() {
         Product product = new Product(1L,
                 "product name",
                 5.00,
                 5);
-
 
         when(productRepository.save(any()))
                 .thenReturn(product);
@@ -68,5 +69,89 @@ public class ProductServiceImplTest {
                 .isThrownBy(() -> productService.create(inputDTO));
     }
 
+
+    @Test
+    @DisplayName("when findById product is call with valid id a product is returned")
+    public void findByIdProductSuccessTest() {
+        Long id = 1L;
+
+        Product product = new Product(1L,
+                "Product A",
+                10.99,
+                10);
+
+
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(product));
+
+        ProductOutputDTO productOutputDTO = productService.findById(id);
+
+        assertThat(productOutputDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(product);
+    }
+
+    @Test
+    @DisplayName("when findById product is call with invalid id throw ProductNotFoundException")
+    public void findByIdProductExceptionTest() {
+        Long id = 1L;
+
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ProductNotFoundException.class)
+                .isThrownBy(() -> productService.findById(id));
+    }
+
+    @Test
+    @DisplayName("when delete product is call with id should does not throw")
+    public void deleteProductTest() {
+        Long id = 1L;
+
+        Product product = new Product(1L,
+                "Product A",
+                10.99,
+                10);
+
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+
+        Assertions.assertThatNoException().isThrownBy(() -> productService.findById(id));
+    }
+
+    @Test
+    @DisplayName("when delete product is call with id should does not throws ProductNotFoundException")
+    public void deleteProductExceptionTest() {
+        Long id = 1L;
+
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ProductNotFoundException.class)
+                .isThrownBy(() -> productService.delete(id));
+    }
+
+    @Test
+    @DisplayName("when findAll pçroduct is call a list of product is returned")
+    public void findAllProductSuccessTest() {
+        List<Product> products = List.of(new Product(1L,
+                        "Product A",
+                        10.99,
+                        100)
+                , new Product(2L,
+                        "Product B",
+                        10.99,
+                        100)
+        );
+
+        when(productRepository.findAll())
+                .thenReturn(products);
+
+        List<ProductOutputDTO> productOutputDTOs = productService.findAll();
+
+        assertThat(productOutputDTOs)
+                .extracting("id", "name", "price","quantityInStock")
+                .contains(
+                        tuple(1L, "Product A", 10.99, 100),
+                        tuple(2L, "Product B", 10.99, 100)
+                );
+    }
 
 }
