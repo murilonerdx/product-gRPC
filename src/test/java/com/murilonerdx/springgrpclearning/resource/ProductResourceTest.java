@@ -90,4 +90,24 @@ public class ProductResourceTest {
                 .withMessage("NOT_FOUND: Produto com id 100 não encontrado");
 
     }
+
+    @Test
+    @DisplayName("when delete is call with valid id, should does not throw")
+    public void deleteSuccessProductTest() {
+        RequestById productRequest = RequestById.newBuilder().setId(1L).build();
+
+        Assertions.assertThatNoException().isThrownBy(() ->
+                productServiceGrpc.delete(productRequest));
+    }
+
+    @Test
+    @DisplayName("when delete is call with invalid id throws ProductNotFoundException")
+    public void deleteExceptionTest() {
+        RequestById productRequest = RequestById.newBuilder().setId(100L).build();
+
+        assertThatExceptionOfType(StatusRuntimeException.class)
+                .isThrownBy(() -> productServiceGrpc.delete(productRequest))
+                .withMessage("NOT_FOUND: Produto com id 100 não encontrado");
+
+    }
 }
