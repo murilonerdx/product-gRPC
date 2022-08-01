@@ -4,6 +4,7 @@ import com.murilonerdx.springgrpclearning.domain.Product;
 import com.murilonerdx.springgrpclearning.dto.ProductInputDTO;
 import com.murilonerdx.springgrpclearning.dto.ProductOutputDTO;
 import com.murilonerdx.springgrpclearning.exception.ProductAlreadyExistsException;
+import com.murilonerdx.springgrpclearning.exception.ProductNotFoundException;
 import com.murilonerdx.springgrpclearning.repository.ProductRepository;
 import com.murilonerdx.springgrpclearning.service.ProductServiceImpl;
 import org.assertj.core.api.Assertions;
@@ -66,6 +67,39 @@ public class ProductServiceImplTest {
 
         assertThatExceptionOfType(ProductAlreadyExistsException.class)
                 .isThrownBy(() -> productService.create(inputDTO));
+    }
+
+
+    @Test
+    @DisplayName("when findById product is call with valid id a product is returned")
+    public void findByIdProductSuccessTest(){
+        Long id = 1L;
+
+        Product product = new Product(1L,
+                "Product A",
+                10.99,
+                10);
+
+
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(product));
+
+        ProductOutputDTO productOutputDTO = productService.findById(id);
+
+        assertThat(productOutputDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(product);
+    }
+
+    @Test
+    @DisplayName("when findById product is call with invalid id throw ProductNotFoundException")
+    public void findByIdProductExceptionTest() {
+        Long id = 1L;
+
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ProductNotFoundException.class)
+                .isThrownBy(() -> productService.findById(id));
     }
 
 
