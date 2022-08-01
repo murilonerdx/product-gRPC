@@ -131,8 +131,6 @@ public class ProductServiceImplTest {
     @Test
     @DisplayName("when findAll pçroduct is call a list of product is returned")
     public void findAllProductSuccessTest() {
-        Long id = 1L;
-
         List<Product> products = List.of(new Product(1L,
                         "Product A",
                         10.99,

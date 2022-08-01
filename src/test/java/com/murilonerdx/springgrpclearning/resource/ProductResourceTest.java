@@ -1,9 +1,6 @@
 package com.murilonerdx.springgrpclearning.resource;
 
-import com.murilonerdx.springgrpclearning.ProductRequest;
-import com.murilonerdx.springgrpclearning.ProductResponse;
-import com.murilonerdx.springgrpclearning.ProductServiceGrpc;
-import com.murilonerdx.springgrpclearning.RequestById;
+import com.murilonerdx.springgrpclearning.*;
 import com.murilonerdx.springgrpclearning.exception.ProductAlreadyExistsException;
 import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -17,7 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.groups.Tuple.tuple;
 
 @SpringBootTest()
 @TestPropertySource("classpath:application-test.properties")
@@ -48,7 +46,7 @@ public class ProductResourceTest {
 
         ProductResponse productResponse = productServiceGrpc.create(productRequest);
 
-        Assertions.assertThat(productRequest)
+        assertThat(productRequest)
                 .usingRecursiveComparison()
                 .comparingOnlyFields("name", "price", "quantity_in_stock")
                 .isEqualTo(productResponse);
@@ -76,8 +74,8 @@ public class ProductResourceTest {
 
         ProductResponse productResponse = productServiceGrpc.findById(productRequest);
 
-        Assertions.assertThat(productResponse.getId()).isEqualTo(productResponse.getId());
-        Assertions.assertThat(productResponse.getName()).isEqualTo("Product A");
+        assertThat(productResponse.getId()).isEqualTo(productResponse.getId());
+        assertThat(productResponse.getName()).isEqualTo("Product A");
     }
 
     @Test
@@ -96,7 +94,7 @@ public class ProductResourceTest {
     public void deleteSuccessProductTest() {
         RequestById productRequest = RequestById.newBuilder().setId(1L).build();
 
-        Assertions.assertThatNoException().isThrownBy(() ->
+        assertThatNoException().isThrownBy(() ->
                 productServiceGrpc.delete(productRequest));
     }
 
@@ -109,5 +107,23 @@ public class ProductResourceTest {
                 .isThrownBy(() -> productServiceGrpc.delete(productRequest))
                 .withMessage("NOT_FOUND: Produto com id 100 não encontrado");
 
+    }
+
+    @Test
+    @DisplayName("when findAll method is call a product list is returned")
+    public void findAllProductSuccessTest() {
+        EmptyRequest request = EmptyRequest.newBuilder().build();
+
+        ProductResponseList responseList = productServiceGrpc.findAll(request);
+
+       assertThat(responseList).isInstanceOf(ProductResponseList.class);
+       assertThat(responseList.getProductsCount()).isEqualTo(2);
+
+        assertThat(responseList.getProductsList())
+                .extracting("id", "name", "price","quantityInStock")
+                .contains(
+                        tuple(1L, "Product A", 10.99, 10),
+                        tuple(2L, "Product B", 10.99, 10)
+                );
     }
 }
