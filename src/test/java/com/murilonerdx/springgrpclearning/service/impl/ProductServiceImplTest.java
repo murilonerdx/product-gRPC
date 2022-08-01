@@ -13,13 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -34,12 +35,11 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("when create product service is call with valid data a product is returned")
-    public void createProductSuccessTest(){
+    public void createProductSuccessTest() {
         Product product = new Product(1L,
                 "product name",
                 5.00,
                 5);
-
 
         when(productRepository.save(any()))
                 .thenReturn(product);
@@ -72,7 +72,7 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("when findById product is call with valid id a product is returned")
-    public void findByIdProductSuccessTest(){
+    public void findByIdProductSuccessTest() {
         Long id = 1L;
 
         Product product = new Product(1L,
@@ -126,6 +126,34 @@ public class ProductServiceImplTest {
 
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productService.delete(id));
+    }
+
+    @Test
+    @DisplayName("when findAll pçroduct is call a list of product is returned")
+    public void findAllProductSuccessTest() {
+        Long id = 1L;
+
+        List<Product> products = List.of(new Product(1L,
+                        "Product A",
+                        10.99,
+                        100)
+                , new Product(2L,
+                        "Product B",
+                        10.99,
+                        100)
+        );
+
+        when(productRepository.findAll())
+                .thenReturn(products);
+
+        List<ProductOutputDTO> productOutputDTOs = productService.findAll();
+
+        assertThat(productOutputDTOs)
+                .extracting("id", "name", "price","quantityInStock")
+                .contains(
+                        tuple(1L, "Product A", 10.99, 100),
+                        tuple(2L, "Product B", 10.99, 100)
+                );
     }
 
 }
