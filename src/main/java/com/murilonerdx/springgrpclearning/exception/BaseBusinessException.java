@@ -10,5 +10,5 @@ public abstract class BaseBusinessException extends RuntimeException{
 
     public abstract Status getStatusCode();
 
-    public abstract String getMessage();
+    public abstract String getErrorMessage();
 }

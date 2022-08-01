@@ -3,11 +3,11 @@ package com.murilonerdx.springgrpclearning.exception;
 
 import io.grpc.Status;
 
-public class AlreadyExistsException extends BaseBusinessException{
+public class ProductAlreadyExistsException extends BaseBusinessException{
     private static final String ERROR_MESSAGE = "Produto %s já cadastrado no sistema";
     private final String name;
 
-    public AlreadyExistsException(String name) {
+    public ProductAlreadyExistsException(String name) {
         super(String.format(ERROR_MESSAGE, name));
         this.name = name;
     }
@@ -18,7 +18,7 @@ public class AlreadyExistsException extends BaseBusinessException{
     }
 
     @Override
-    public String getMessage() {
+    public String getErrorMessage() {
         return String.format(ERROR_MESSAGE, name);
     }
 }

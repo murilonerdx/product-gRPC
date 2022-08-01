@@ -4,10 +4,11 @@ package com.murilonerdx.springgrpclearning.resources;
 import com.murilonerdx.springgrpclearning.*;
 import com.murilonerdx.springgrpclearning.dto.ProductInputDTO;
 import com.murilonerdx.springgrpclearning.dto.ProductOutputDTO;
+import com.murilonerdx.springgrpclearning.exception.ProductAlreadyExistsException;
+import com.murilonerdx.springgrpclearning.repository.ProductRepository;
 import com.murilonerdx.springgrpclearning.service.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 @GrpcService
 public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
@@ -53,4 +54,6 @@ public class ProductResource extends ProductServiceGrpc.ProductServiceImplBase{
     public void findAll(EmptyRequest request, StreamObserver<ProductResponseList> responseObserver) {
         super.findAll(request, responseObserver);
     }
+
+
 }

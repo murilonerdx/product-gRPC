@@ -18,7 +18,7 @@ public class ProductNotFoundException extends BaseBusinessException{
     }
 
     @Override
-    public String getMessage() {
+    public String getErrorMessage() {
         return String.format(ERROR_MESSAGE, id);
     }
 }
